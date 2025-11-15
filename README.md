@@ -157,3 +157,230 @@ Now  am connecting to the database using ssh using the bastion host using the fo
 <img width="1490" height="753" alt="powershell" src="https://github.com/user-attachments/assets/7318ee4e-80db-4185-ba6d-f1e46576a08e" />
 
 **Successfully connected 😁**
+
+Now lets connect our database to Sqlelectron to manage our database using the following steps:
+
+|Setting |	Value   |
+|--------|--------- |
+|Host	   |127.0.0.1 |
+|Port	   |3306      |
+|User	   |admin     |
+|Password|	(your updated password)|
+|Database|	mydb(initial database name)|
+
+<img width="1905" height="1015" alt="Testing-Database" src="https://github.com/user-attachments/assets/c0328f44-4486-4410-ac05-c250706d31c0" />
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+**❗ IMPORTANT: How to structure Security Groups**
+
+<p>✅ Security Group Setup (Correct Configuration)</p>
+<p>You will have three SGs:</p>
+
+<p>SG-Bastion → attached to your Bastion Host (EC2 in public subnet)</p>
+<p>SG-RDS → attached to your RDS instance</p>
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+**1️⃣ Security Group for the Bastion Host (SG-Bastion)**
+
+<p>Inbound rules (IN)</p>
+
+|Type |	Port |	Source|
+|-----|-----|--------|
+|SSH	|22	|Your Local Machine IP (e.g., 196.xx.xx.xx/32|
+
+➡️ This ensures ONLY you can SSH into the bastion.
+
+<p>Outbound rules (OUT)</p>
+  Allow All (default): 0.0.0.0/0
+<p>➡️ The bastion must be able to communicate out to the RDS.</p>
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+**2️⃣ Security Group for RDS (SG-RDS)**
+
+<p>Inbound rules (IN)</p>
+
+|Type |	Port |	Source |
+|-----|------|---------|
+|MySQL / PostgreSQL / SQL Server (depending on your DB)|	3306 / 5432 / 1433	|SG-Bastion|
+
+**Important:**
+<p>Make the source the Bastion Host security group, NOT an IP address.</p>
+<p>➡️ This ensures only the EC2 bastion is allowed to reach RDS.</p>
+
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+## Phase 3: CREATE  ECS Cluster, Task Definition and Task
+<a name="AmazonECS"></a>
+
+**Steps on how to create a ECS Cluster**
+
+
+<p>In the ECS Dashboard, click on Clusters in the left sidebar.</p>
+<p>Click on the Create cluster button.</p>
+<p>Choose a Cluster Template</p>
+<p>Select a Cluster template that fits your needs. You typically have options like:</p>
+<p>Networking only (for Fargate launch type).</p>
+<p>EC2 Linux + Networking (for EC2 launch type).</p>
+<p>EC2 Windows + Networking (for Windows-based applications).</p>
+
+**Configure Cluster Settings**
+
+<p>Cluster name: Enter a name for your cluster.</p>
+<p>Provisioning model: Choose between the default settings or customize EC2 instance types, number of instances, etc., if using the EC2 launch type.</p>
+<p>Additional options: Configure settings like Capacity Providers, IAM Roles, and VPC settings based on your requirements.</p>
+<p>Click Create.</p>
+
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+<img width="1910" height="767" alt="Cluster1" src="https://github.com/user-attachments/assets/19a409bf-0645-4ae6-aeb9-4db9bd2a336d" />
+
+
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+<img width="1897" height="763" alt="Cluster2" src="https://github.com/user-attachments/assets/cf9fbe66-005a-497e-a270-152871617647" />
+
+
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+**Steps on how to create an ECS Task Definition**
+
+<p>In the ECS Dashboard, click on Task Definitions in the left sidebar.</p>
+<p>Click on the Create new Task Definition button.</p>
+<p>Select the appropriate launch type for your task:</p>
+  <p>Fargate (serverless)</p>
+  <p>EC2 (for EC2 instances)</p>
+<p>Task Definition Name: Enter a unique name for your task definition.</p>
+<p>Task Role (optional): Select an IAM role that the task can assume for permissions.</p>
+<p>Network Mode: Choose the network mode for the containers in the task:</p>
+  <p>bridge (default)</p>
+  <p>host</p>
+  <p>awsvpc (required for Fargate)</p>
+<p>Add Container Definitions</p>
+<p>Click on Add container.</p>
+
+**Fill in the following details for the container:**
+
+<p>Container name: A unique name for the container.</p>
+  <p>Image: Specify the Docker image (e.g., nginx:latest).</p>
+  <p>Memory Limits: Allocate task memory (optional).</p>
+  <p>CPU Units: Specify CPU units (optional).</p>
+  <p>Environment Variables: Add any environment variables your container needs.</p>
+  <p>Port Mappings: Define ports to expose the container (e.g., container port 80 or 3000).</p>
+<p>Click Add after configuring the container.</p>
+<p>After configuring all containers and settings, click on the Create button at the bottom of the page.</p>
+
+
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+<img width="1902" height="822" alt="TaskDefine1" src="https://github.com/user-attachments/assets/da14b08b-5994-4377-9dec-4ac4ccc63147" />
+
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+<img width="1867" height="827" alt="TaskDefine2" src="https://github.com/user-attachments/assets/1ad3e7a3-54a2-4a49-a6f1-c6e864d00dcf" />
+
+Add a port mapping to your
+<img width="1902" height="387" alt="AddPortMapping" src="https://github.com/user-attachments/assets/2990ce5f-3b8a-49ed-aa18-a0b911d62c26" />
+
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+<img width="1906" height="820" alt="ChooseimageInTSD" src="https://github.com/user-attachments/assets/17763e4f-e0ba-4f60-9c5a-3c15cf3dc208" />
+
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+<img width="1861" height="870" alt="ChooseimageInTSD2" src="https://github.com/user-attachments/assets/5e99b2e0-7018-4ef9-9abf-748a87a29bbf" />
+
+
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+**Steps on how to create an ECS Task**
+
+<p>To run the task, go back to the ECS Dashboard and select your cluster.</p>
+<p>Click on the Tasks tab, then click on Run new Task.</p>
+<p>Select the task definition you just created and configure the launch type (Fargate or EC2).</p>
+<p>Choose the number of tasks and any additional settings, then click Run Task.</p>
+
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+<img width="1908" height="772" alt="Task1" src="https://github.com/user-attachments/assets/9873f603-89f0-404c-9100-85df0b35bbe2" />
+
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+<img width="1886" height="765" alt="Task2" src="https://github.com/user-attachments/assets/38e76b55-3e56-4622-8262-c8401fcdb6f9" />
+
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+<img width="1892" height="765" alt="Task3" src="https://github.com/user-attachments/assets/677603c0-95c9-44a0-92f0-c5543a3e8597" />
+
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+<img width="1893" height="766" alt="Task4" src="https://github.com/user-attachments/assets/149f1d36-cdcb-4003-881e-f0cff1f5a67e" />
+
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+<img width="1876" height="762" alt="Task5" src="https://github.com/user-attachments/assets/e104a53f-9e2b-4bd6-848c-463cabda76d5" />
+
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+<img width="1900" height="870" alt="TaskRunning" src="https://github.com/user-attachments/assets/84113b2d-b397-4ff7-b70e-eecd7108f794" />
+
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+## Phase 4: CREATE  Application Load Balancer
+<a name="AmazonALB"></a>
+
+<p>Open EC2 Dashboard: Search for and select EC2.</p>
+<p>Navigate to Load Balancers: In the left sidebar, click on Load Balancers under Load Balancing.</p>
+<p>Create Load Balancer: Click Create Load Balancer and select Application Load Balancer.</p>
+<p>Configure Basic Settings:</p>
+<p>Enter a name for the load balancer.</p>
+<p>Choose the scheme (Internet-facing or Internal).</p>
+<p>Select the IP address type (IPv4 or Dualstack).</p>
+<p>Configure Listeners and Availability Zones:</p>
+<p>Set up listeners (default is HTTP on port 80, And port mapping your container).</p>
+<p>Select a VPC and subnet(s) for availability zones.</p>
+<p>Configure Security Groups: Choose or create a security group that allows inbound traffic on your listener ports.</p>
+<p>Configure Routing:</p>
+<p>Create a target group and specify its name, target type, and health check settings.</p>
+<p>Register targets (EC2 instances) in the target group.</p>
+<p>Review and Create: Review your settings and click Create Load Balancer.</p>
+
+Monitor: Once created, monitor the ALB from the Load Balancers section and test it using the provided DNS name.
+
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+<img width="1905" height="762" alt="ALB-TG" src="https://github.com/user-attachments/assets/6bf96f1c-7d91-4799-a379-f6c2438a45c8" />
+
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+<img width="1897" height="763" alt="ALB-TG2" src="https://github.com/user-attachments/assets/adbf4974-d6d3-4e0b-bffe-f18e44206c19" />
+
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+<img width="1903" height="761" alt="ALB-TG3" src="https://github.com/user-attachments/assets/dbbfa6d5-70e4-4aa7-926d-c8b34bdbc23b" />
+
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+<img width="1892" height="755" alt="AddListener-ALB" src="https://github.com/user-attachments/assets/fb2fdaa5-07ff-4ff1-97cc-4dafc7178c61" />
+
+<img width="1905" height="763" alt="AddACMCert-toALB" src="https://github.com/user-attachments/assets/3f62ff60-2a45-44fe-968a-cfd5888dbe52" />
+
+
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+## Phase 5: Request a Certicficate with ACM
+<a name="RequestACertficate"></a>
+
+l had already requested my Certificate but, to request a Certificate you need to have a domain and then follow the steps on the Amazon ACM page to get a certificate it takes 5 - 10 minutes to get your certificate.
+
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+<img width="1897" height="360" alt="RequestACM" src="https://github.com/user-attachments/assets/f0e0d5dc-86c9-4174-a30c-a7644814094a" />
+
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+## Phase 6 : Setting Up Route 53
+<a name="Route53-Setup"></a>
+
+i already have a domain in Route 53, l only have to create a record for my Amazon ALB as an Alias so that it can be reachable to the public in secure way.
+
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+<img width="1872" height="762" alt="Route53" src="https://github.com/user-attachments/assets/2b68705a-3601-469d-a9ad-945b40721120" />
+
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
