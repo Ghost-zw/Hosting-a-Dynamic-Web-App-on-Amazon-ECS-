@@ -22,6 +22,7 @@ As we progress through this guide, we'll set up each of these components step by
 2. [Why we need to  host a Dynamic Web App n containers and using Amazon ECS ](#DynamicWebsiteApp)
   - Phase 1 : [Create VPC](#CreateVPC)
   - Phase 2 : [Create Database](#CreateDatabase)
+  - Phase 2 : [Create BastionHost](#CreateBastionHost)
   - Phase 3 : [Setup Amazon ECS](#AmazonECS)
   - Phase 4 : [Setup Amazon ALB](#AmazonALB)
   - Phase 5 : [Request a Certicficate with ACM](#RequestACertficate)
@@ -127,3 +128,32 @@ l am going to create an RDS Database which allows this Car Rental App to insert 
 <img width="1902" height="761" alt="CreateDB6" src="https://github.com/user-attachments/assets/aefc123c-2037-4d02-85b0-e99bcd2b39ca" />
 
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+<p>In order to create tables and manage this RDS Database l used Sqlelectron, Sqlectron is a free, open-source SQL client designed for managing relational databases with a simple and user-friendly interface. It supports both GUI and terminal-based usage, making it versatile for developers and database administrators.</p>
+<p>This database is going to be created in a private subnet  to enhance security, to access this database in the private subnet, a bastion host is required which will be created in public subnet of the same VPC.</p>
+<p>A <b>bastion host</b> is a special-purpose server used to provide secure access to a private network from an external network, typically the internet. It acts as a gateway between a public-facing network and a private internal network.</p>
+
+<p>Below is the creation of a bastion host:</p>
+
+<img width="1897" height="757" alt="CreateBastionH" src="https://github.com/user-attachments/assets/f0218991-70e0-413f-a83e-97ecc1ae8e96" />
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+<img width="1870" height="707" alt="CreateBastionH2" src="https://github.com/user-attachments/assets/a429fa12-3b48-47a2-a598-3a8c7fe93ba6" />
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+<img width="1871" height="762" alt="CreateBastionH3" src="https://github.com/user-attachments/assets/55b6b44e-b01b-4102-a1d6-1791801312d9" />
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Now  am connecting to the database using ssh using the bastion host using the following steps:
+
+<p>On your local machine open Powershell</p>
+<p>run this command ssh -i /path/to/key.pem ec2-user@<bastion-public-ip></p>
+<p>Make sure to replace /path/to/key.pem with the path to your .pem key, and replace <bastion-public-ip> with your bastion host public IP  </p>
+<p>If successfull you going to see an image like the one below</p>
+  
+<img width="1490" height="753" alt="powershell" src="https://github.com/user-attachments/assets/7318ee4e-80db-4185-ba6d-f1e46576a08e" />
+
+**Successfully connected 😁**
