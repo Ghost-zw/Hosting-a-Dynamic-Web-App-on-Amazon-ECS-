@@ -376,11 +376,47 @@ l had already requested my Certificate but, to request a Certificate you need to
 ## Phase 6 : Setting Up Route 53
 <a name="Route53-Setup"></a>
 
-i already have a domain in Route 53, l only have to create a record for my Amazon ALB as an Alias so that it can be reachable to the public in secure way.
+l already have a domain in Route 53, l only have to create a record for my Amazon ALB as an Alias so that it can be reachable to the public in secure way.
 
 -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 <img width="1872" height="762" alt="Route53" src="https://github.com/user-attachments/assets/2b68705a-3601-469d-a9ad-945b40721120" />
 
 -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+## Phase 7 : Test the the whole solution
+<a name="Testing"></a>
+
+My first test was using the ECS Task's Public ip with a port binding to my container whch is port 3000
+
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+<img width="1873" height="892" alt="Testing1" src="https://github.com/user-attachments/assets/fab3e15f-21f0-44dd-b03e-ba87c8a1ba0d" />
+
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+The second test is using ALB which is connected to my ECS Tasks.
+
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+<img width="1877" height="990" alt="TestingALB" src="https://github.com/user-attachments/assets/8adec199-a431-4a2b-8d27-f58ca38eb8c9" />
+
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+The thrird test is when l used my Route 53 Record tech-with-tanaka.com
+
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+<img width="1897" height="1063" alt="Testing-Route53" src="https://github.com/user-attachments/assets/92db8dc9-2100-4634-a19a-c1b2aeeb9351" />
+
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+**3. Conclusion**
+<a name="Conclusion"></a>
+
+Future improvements to this architecture.
+Move ECS tasks to private subnets -> Better security (this app cannot be scanned or attacked directly)
+Replace bastion host with SSM Session Manager
+More secure and cheaper (you can delete the bastion host)
+Adding auto scaling for ECS and RDS
+
+
 
