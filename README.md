@@ -128,7 +128,11 @@ l am going to create an RDS Database which allows this Car Rental App to insert 
 
 <img width="1902" height="761" alt="CreateDB6" src="https://github.com/user-attachments/assets/aefc123c-2037-4d02-85b0-e99bcd2b39ca" />
 
-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+## Phase 2: Create SSM Manager
+<a name="CreateSSMManager"></a>
 
 <p>In order to create tables and manage this RDS Database l used Sqlelectron, Sqlectron is a free, open-source SQL client designed for managing relational databases with a simple and user-friendly interface. It supports both GUI and terminal-based usage, making it versatile for developers and database administrators.</p>
 <p>This database is going to be created in a private subnet  to enhance security, to access this database in the private subnet, a bastion host is required which will be created in public subnet of the same VPC.</p>
