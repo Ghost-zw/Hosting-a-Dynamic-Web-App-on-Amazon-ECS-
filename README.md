@@ -22,12 +22,12 @@ As we progress through this guide, we'll set up each of these components step by
 2. [Why we need to  host a Dynamic Web App n containers and using Amazon ECS ](#DynamicWebsiteApp)
   - Phase 1 : [Create VPC](#CreateVPC)
   - Phase 2 : [Create Database](#CreateDatabase)
-  - Phase 2 : [Create BastionHost](#CreateBastionHost)
-  - Phase 3 : [Setup Amazon ECS](#AmazonECS)
-  - Phase 4 : [Setup Amazon ALB](#AmazonALB)
-  - Phase 5 : [Request a Certicficate with ACM](#RequestACertficate)
-  - Phase 6 : [Setting Up Route 53](#Route53-Setup)
-  - Phase 7 : [Test the the whole solution](#Testing)
+  - Phase 3 : [Create SSM Manager](#CreateSSMManager)
+  - Phase 4 : [Setup Amazon ECS](#AmazonECS)
+  - Phase 5 : [Setup Amazon ALB](#AmazonALB)
+  - Phase 6 : [Request a Certicficate with ACM](#RequestACertficate)
+  - Phase 7 : [Setting Up Route 53](#Route53-Setup)
+  - Phase 8 : [Test the the whole solution](#Testing)
 3. [Conclusion](#Conclusion)
 
 # Overview of Hosting a Dynamic Web App on Amazon ECS using fargate instances, Amazon RDS, Amazon ALB, Amazon ECR and ACM Architecture 
@@ -102,6 +102,7 @@ The purpose of a NAT Gateway in a private routing table is to facilitate outboun
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 ## Phase 2: Create Database
+<a name="CreateDatabase"></a>
 
 l am going to create an RDS Database which allows this Car Rental App to insert booking details when a customer wants to rent a car. l previously created the same Database and created a snapshot from that Database, l am going to restore this snapshot in this newly created VPC in a private subnet.
 
