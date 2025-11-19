@@ -146,14 +146,14 @@ l am going to create an RDS Database which allows this Car Rental App to insert 
 <p>6.No public IP, no SSH, no key pair.</p>
 <p>7.Attach sg-ssm-host.</p>
 <p>8.Configure Security Groups</p>
-  <p>sg-ssm-host → outbound: allow DB port to sg-rds.</p>
-  <p>sg-rds → inbound: allow DB port from sg-ssm-host.</p>
-  <p>sg-endpoints → inbound: allow TCP/443 from sg-ssm-host.</p>
+      <p>sg-ssm-host → outbound: allow DB port to sg-rds.</p>
+      <p>sg-rds → inbound: allow DB port from sg-ssm-host.</p>
+      <p>sg-endpoints → inbound: allow TCP/443 from sg-ssm-host.</p>
 <p>9.Create VPC Interface Endpoints</p>
 <p>10.Create these endpoints in the same private subnets:</p>
-  <p>com.amazonaws.<region>.ssm</p>
-  <p>com.amazonaws.<region>.ec2messages</p>
-  <p>com.amazonaws.<region>.ssmmessages</p>
+      <p>com.amazonaws.<region>.ssm</p>
+      <p>com.amazonaws.<region>.ec2messages</p>
+      <p>com.amazonaws.<region>.ssmmessages</p>
 <p>11.Enable Private DNS, attach sg-endpoints.</p>
 <p>12.Verify EC2 is SSM-managed</p>
 <p>13.Systems Manager → Fleet Manager → instance should appear.</p>
