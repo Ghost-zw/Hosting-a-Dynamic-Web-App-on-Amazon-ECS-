@@ -24,10 +24,11 @@ As we progress through this guide, we'll set up each of these components step by
   - Phase 2 : [Create Database](#CreateDatabase)
   - Phase 3 : [Create SSM Manager](#CreateSSMManager)
   - Phase 4 : [Setup Amazon ECS](#AmazonECS)
-  - Phase 5 : [Setup Amazon ALB](#AmazonALB)
-  - Phase 6 : [Request a Certicficate with ACM](#RequestACertficate)
-  - Phase 7 : [Setting Up Route 53](#Route53-Setup)
-  - Phase 8 : [Test the the whole solution](#Testing)
+  - Phase 5 : [Setup Amazon Cloudfront](#AmazonALB)
+  - Phase 6 : [Setup Amazon ALB](#AmazonALB)
+  - Phase 7 : [Request a Certicficate with ACM](#RequestACertficate)
+  - Phase 8 : [Setting Up Route 53](#Route53-Setup)
+  - Phase 9 : [Test the the whole solution](#Testing)
 3. [Conclusion](#Conclusion)
 
 # Overview of Hosting a Dynamic Web App on Amazon ECS using fargate instances, Amazon RDS, Amazon ALB, Amazon ECR and ACM Architecture 
@@ -131,18 +132,43 @@ l am going to create an RDS Database which allows this Car Rental App to insert 
 ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 
-## Phase 2: Create SSM Manager
+## Phase 3: Create SSM Manager
 <a name="CreateSSMManager"></a>
 
-<p>In order to create tables and manage this RDS Database l used Sqlelectron, Sqlectron is a free, open-source SQL client designed for managing relational databases with a simple and user-friendly interface. It supports both GUI and terminal-based usage, making it versatile for developers and database administrators.</p>
-<p>This database is going to be created in a private subnet  to enhance security, to access this database in the private subnet, a bastion host is required which will be created in public subnet of the same VPC.</p>
-<p>A <b>bastion host</b> is a special-purpose server used to provide secure access to a private network from an external network, typically the internet. It acts as a gateway between a public-facing network and a private internal network.</p>
+<p>This process securely exposes a private RDS instance to a local machine without using public IPs, SSH, or bastion hosts. A private EC2 instance with the SSM Agent acts as a controlled pivot point, communicating with the AWS SSM control plane through VPC Interface Endpoints instead of the internet. When you initiate a Session Manager port-forwarding session, SSM establishes an authenticated, encrypted WebSocket channel between your laptop and the EC2 instance. AWS then tunnels local traffic through this channel to the RDS endpoint, allowing direct DB access while keeping all infrastructure fully private, tightly IAM-controlled, and auditable in CloudTrail.</p>
+<p>Below is the creation of SSM Manager:</p>
 
-<p>Below is the creation of a bastion host:</p>
+<p>1.Create EC2 IAM Role</p>
+<p>2.Create IAM role with AmazonSSMManagedInstanceCore.</p>
+<p>3.Create instance profile and attach it to the EC2.</p>
+<p>4.Launch EC2 SSM Host (Private Only)</p>
+<p>5.Private subnet only.</p>
+<p>6.No public IP, no SSH, no key pair.</p>
+<p>7.Attach sg-ssm-host.</p>
+<p>8.Configure Security Groups</p>
+  <p>sg-ssm-host → outbound: allow DB port to sg-rds.</p>
+  <p>sg-rds → inbound: allow DB port from sg-ssm-host.</p>
+  <p>sg-endpoints → inbound: allow TCP/443 from sg-ssm-host.</p>
+<p>9.Create VPC Interface Endpoints</p>
+<p>10.Create these endpoints in the same private subnets:</p>
+  <p>com.amazonaws.<region>.ssm</p>
+  <p>com.amazonaws.<region>.ec2messages</p>
+  <p>com.amazonaws.<region>.ssmmessages</p>
+<p>11.Enable Private DNS, attach sg-endpoints.</p>
+<p>12.Verify EC2 is SSM-managed</p>
+<p>13.Systems Manager → Fleet Manager → instance should appear.</p>
+
+```json
+{
+  "host": ["<rds-endpoint>"],
+  "portNumber": ["3306"],
+  "localPortNumber": ["3306"]
+}
+```
 
 <img width="1897" height="757" alt="CreateBastionH" src="https://github.com/user-attachments/assets/f0218991-70e0-413f-a83e-97ecc1ae8e96" />
 
-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 <img width="1870" height="707" alt="CreateBastionH2" src="https://github.com/user-attachments/assets/a429fa12-3b48-47a2-a598-3a8c7fe93ba6" />
 
@@ -155,11 +181,18 @@ l am going to create an RDS Database which allows this Car Rental App to insert 
 Now  am connecting to the database using ssh using the bastion host using the following steps:
 
 <p>On your local machine open Powershell</p>
-<p>run this command ssh -i /path/to/key.pem ec2-user@<bastion-public-ip></p>
-<p>Make sure to replace /path/to/key.pem with the path to your .pem key, and replace <bastion-public-ip> with your bastion host public IP  </p>
-<p>If successfull you going to see an image like the one below</p>
+<p>run this command </p>
+```json
+{
+  "host": ["<rds-endpoint>"],
+  "portNumber": ["3306"],
+  "localPortNumber": ["3306"]
+}
+```
+<p>If successfull you going to see a Connection Accepted Session</p>
   
-<img width="1490" height="753" alt="powershell" src="https://github.com/user-attachments/assets/7318ee4e-80db-4185-ba6d-f1e46576a08e" />
+<img width="1096" height="973" alt="SSM-Powershell-connect" src="https://github.com/user-attachments/assets/85345a36-8834-4eb6-97ea-787d992ae95e" />
+
 
 **Successfully connected 😁**
 
@@ -182,40 +215,7 @@ Now lets connect our database to Sqlelectron to manage our database using the fo
 <p>✅ Security Group Setup (Correct Configuration)</p>
 <p>You will have three SGs:</p>
 
-<p>SG-Bastion → attached to your Bastion Host (EC2 in public subnet)</p>
-<p>SG-RDS → attached to your RDS instance</p>
-
-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-
-**1️⃣ Security Group for the Bastion Host (SG-Bastion)**
-
-<p>Inbound rules (IN)</p>
-
-|Type |	Port |	Source|
-|-----|-----|--------|
-|SSH	|22	|Your Local Machine IP (e.g., 196.xx.xx.xx/32|
-
-➡️ This ensures ONLY you can SSH into the bastion.
-
-<p>Outbound rules (OUT)</p>
-  Allow All (default): 0.0.0.0/0
-<p>➡️ The bastion must be able to communicate out to the RDS.</p>
-
-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-
-**2️⃣ Security Group for RDS (SG-RDS)**
-
-<p>Inbound rules (IN)</p>
-
-|Type |	Port |	Source |
-|-----|------|---------|
-|MySQL / PostgreSQL / SQL Server (depending on your DB)|	3306 / 5432 / 1433	|SG-Bastion|
-
-**Important:**
-<p>Make the source the Bastion Host security group, NOT an IP address.</p>
-<p>➡️ This ensures only the EC2 bastion is allowed to reach RDS.</p>
-
--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 ## Phase 3: CREATE  ECS Cluster, Task Definition and Task
 <a name="AmazonECS"></a>
