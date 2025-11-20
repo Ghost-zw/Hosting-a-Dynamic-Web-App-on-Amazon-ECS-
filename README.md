@@ -4,7 +4,8 @@ This guide is going to show you how to create an Amazon S3 Website, using Amazon
 
 # Architecture 
 
-<img width="1391" height="477" alt="Dynamic-web-app-arch" src="https://github.com/user-attachments/assets/3974cf12-5a2d-499f-b659-00e6e04cd29c" />
+<img width="1435" height="463" alt="Dynamic-webapp" src="https://github.com/user-attachments/assets/c7ef7f14-f820-4607-b310-b1bd27088629" />
+
 
 
 This diagram shows the key components of our setup, including:
@@ -31,7 +32,8 @@ As we progress through this guide, we'll set up each of these components step by
   - Phase 6 : [Setup Amazon ALB](#AmazonALB)
   - Phase 7 : [Request a Certicficate with ACM](#RequestACertficate)
   - Phase 8 : [Setting Up Route 53](#Route53-Setup)
-  - Phase 9 : [Test the the whole solution](#Testing)
+  - Phase 9 : [Bonus](#Bonus)
+  - Phase 10 : [Test the the whole solution](#Testing)
 3. [Conclusion](#Conclusion)
 
 # Overview of Hosting a Dynamic Web App on Amazon ECS using fargate instances, Amazon RDS, Amazon ALB, Amazon ECR and ACM Architecture 
@@ -78,7 +80,7 @@ This allow the public subnets to have IPv4 Addressses
 
 -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-**Set Public Subnet as Main Route Table:**
+**Set Private Subnet as main route table:**
 
 
 <img width="1902" height="843" alt="setRouteTable" src="https://github.com/user-attachments/assets/e9b9cced-6735-4d48-ac24-2bd48bfd41bf" />
@@ -150,20 +152,20 @@ l am going to create an RDS Database which allows this Car Rental App to insert 
 <p>7.Attach sg-ssm-host.</p>
 <p>8.Configure Security Groups</p>
 
-   {
-     <p>sg-ssm-host → outbound: allow DB port to sg-rds.</p>
-      <p>sg-rds → inbound: allow DB port from sg-ssm-host.</p>
-      <p>sg-endpoints → inbound: allow TCP/443 from sg-ssm-host.</p>
+      {
+      sg-ssm-host → outbound: allow DB port to sg-rds.
+      sg-rds → inbound: allow DB port from sg-ssm-host.
+      sg-endpoints → inbound: allow TCP/443 from sg-ssm-host.
       }
       
 <p>9.Create VPC Interface Endpoints</p>
 <p>10.Create these endpoints in the same private subnets:</p>
 
 
-    {
-     <p>com.amazonaws.<region>.ssm</p>
-      <p>com.amazonaws.<region>.ec2messages</p>
-      <p>com.amazonaws.<region>.ssmmessages</p>
+     {
+     com.amazonaws.<region>.ssm
+      com.amazonaws.<region>.ec2messages
+      com.amazonaws.<region>.ssmmessages
        } 
 <p>11.Enable Private DNS, attach sg-endpoints.</p>
 <p>12.Verify EC2 is SSM-managed</p>
@@ -187,15 +189,15 @@ Now  am connecting to the database using SSM Port Forwarding using the bastion h
 <p>On your local machine open Powershell</p>
 <p>run this command </p>
 
-{
-<p>aws ssm start-session `</p>
+  {
+ <p>aws ssm start-session `</p>
   <p>--target "i-0ac8229767bf4826a" `</p>
   <p>--document-name "AWS-StartPortForwardingSessionToRemoteHost" `</p>
   <p>--parameters file://C:\Users\Tanaka\ssm-port.json</p>
   } 
 
 
-<p>If successfull you going to see a Connection Accepted Session</p>
+<p><b>If successfull you going to see a Connection Accepted Session</b></p>
   
 <img width="1096" height="973" alt="SSM-Powershell-connect" src="https://github.com/user-attachments/assets/85345a36-8834-4eb6-97ea-787d992ae95e" />
 
@@ -216,12 +218,6 @@ Now lets connect our database to Sqlelectron to manage our database using the fo
 
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-**❗ IMPORTANT: How to structure Security Groups**
-
-<p>✅ Security Group Setup (Correct Configuration)</p>
-<p>You will have three SGs:</p>
-
----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 ## Phase 4: CREATE  ECS Cluster, Task Definition and Task
 <a name="AmazonECS"></a>
@@ -438,14 +434,31 @@ l already have a domain in Route 53, l only have to create a record for my Amazo
 <img width="1872" height="762" alt="Route53" src="https://github.com/user-attachments/assets/2b68705a-3601-469d-a9ad-945b40721120" />
 
 ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+## Phase 9 : Bonus
+<a name="Bonus"></a>
 
-## Phase 9 : Test the the whole solution
+**❗ IMPORTANT: How to structure Security Groups**
+
+<p>✅ Security Group Setup (Correct Configuration)</p>
+<p>You will have three SGs:</p>
+
+| Component      | Inbound                                     | Outbound                     | Public? |
+| -------------- | ------------------------------------------- | ---------------------------- | ------- |
+| **ALB SG**     | 80/443 from Internet                        | App port → ECS SG            | Yes     |
+| **ECS SG**     | App port from ALB SG                        | DB port → RDS SG             | No      |
+| **RDS SG**     | DB port from ECS SG (+ optional SSM EC2 SG) | AWS internal                 | No      |
+| **SSM EC2 SG** | None                                        | SSM Endpoints + optional RDS | No      |
+
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+## Phase 10 : Test the the whole solution
 <a name="Testing"></a>
 
-My first test was using the ECS Task's Public ip with a port binding to my container whch is port 3000
+My first test was using my ALB
 
--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-<img width="1873" height="892" alt="Testing1" src="https://github.com/user-attachments/assets/fab3e15f-21f0-44dd-b03e-ba87c8a1ba0d" />
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+<img width="1918" height="967" alt="Testing-ALB-1" src="https://github.com/user-attachments/assets/b4e95f1f-2021-4249-a213-8e57d38926bb" />
 
 ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -457,7 +470,7 @@ The second test is using ALB which is connected to my ECS Tasks.
 
 ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-The thrird test is when l used my Route 53 Record tech-with-tanaka.com
+The third test is when l used my Route 53 Record tech-with-tanaka.com
 
 ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -465,15 +478,14 @@ The thrird test is when l used my Route 53 Record tech-with-tanaka.com
 
 ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-
 **3. Conclusion**
 <a name="Conclusion"></a>
 
-Future improvements to this architecture.
-Move ECS tasks to private subnets -> Better security (this app cannot be scanned or attacked directly)
-Replace bastion host with SSM Session Manager
-More secure and cheaper (you can delete the bastion host)
-Adding auto scaling for ECS and RDS
+<p>-AWS WAF integration on CloudFront</p>
+<p>-Multi-AZ RDS for high availability</p>
+<p>-Secrets Manager for secure credential rotation </p>
+<p>-Improved observability using CloudWatch dashboards and alarms </p>
+<p>-ElastiCache (Redis) for session and query caching</p>
 
 
 
