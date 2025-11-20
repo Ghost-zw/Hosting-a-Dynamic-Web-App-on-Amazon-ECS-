@@ -1,0 +1,20 @@
+{
+  "name": "car-rent-website",
+  "version": "1.0.0",
+  "description": "For car rental app",
+  "main": "server.js",
+  "directories": {
+    "lib": "lib"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^5.1.0",
+    "mysql2": "^3.15.3"
+  }
+}
