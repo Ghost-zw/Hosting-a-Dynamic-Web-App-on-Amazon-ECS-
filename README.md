@@ -14,8 +14,8 @@ This diagram shows the key components of our setup, including:
 <p><b>Amazon RDS</b> is a managed cloud database service that automates routine tasks for relational databases, making it easier to set up, operate, and scale.</p>
 <p><b>Amazon ECS (Elastic Container Service)</b> is a managed service for running and managing Docker containers, while Amazon ECR (Elastic Container Registry) is a fully managed Docker container registry for storing, managing, and deploying container images.</p>
 <p><b>Amazon ALB (Application Load Balancer)</b> is a managed load balancing service that automatically distributes incoming application traffic across multiple targets, such as EC2 instances or containers, to enhance application availability and performance.</p>
-<p>Amazon CloudFront is a fast content delivery network (CDN) that securely delivers data, videos, applications, and APIs to users globally with low latency and high transfer speeds.</p>
-<p>Amazon Systems Manager Session Manager is a secure and fully managed tool that allows you to remotely access and manage your AWS instances without the need for an SSH connection or opening inbound ports.</P>
+<p><b>Amazon CloudFront</b> is a fast content delivery network (CDN) that securely delivers data, videos, applications, and APIs to users globally with low latency and high transfer speeds.</p>
+<p><b>Amazon Systems Session Manager</b> is a secure and fully managed tool that allows you to remotely access and manage your AWS instances without the need for an SSH connection or opening inbound ports.</P>
 <p><b>Amazon VPC (Virtual Private Cloud</b>) is a service that allows users to create a logically isolated network in the AWS cloud, enabling control over network configuration, IP address range, and security settings.</p>
 
 As we progress through this guide, we'll set up each of these components step by step.
@@ -50,13 +50,13 @@ Hosting a dynamic web app in containers and deploying it with Amazon ECS ensures
 <a name="CreateVPC"></a>
 
 <p>1.In the VPC Dashboard, click on Your VPCs in the left sidebar.</p>
-<p>Click on the Create VPC button.</p>
-<p>Fill in the following fields:</p>
-<p>Name tag: A name for your VPC (e.g., "MyCustomVPC").</p>
-<p>IPv4 CIDR block: Specify an IP range using CIDR notation (e.g., 10.0.0.0/16).</p>
-<p>IPv6 CIDR block (optional): You can assign an IPv6 block if needed.</p>
-<p>Tenancy: Choose between default (shared) or dedicated for hardware.</p>
-<p>Click on Create VPC.</p>
+<p>2.Click on the Create VPC button.</p>
+<p>3.Fill in the following fields:</p>
+<p>4.Name tag: A name for your VPC (e.g., "MyCustomVPC").</p>
+<p>5.IPv4 CIDR block: Specify an IP range using CIDR notation (e.g., 10.0.0.0/16).</p>
+<p>6.IPv6 CIDR block (optional): You can assign an IPv6 block if needed.</p>
+<p>7.Tenancy: Choose between default (shared) or dedicated for hardware.</p>
+<p>8.Click on Create VPC.</p>
 
 <img width="1895" height="812" alt="VPC1" src="https://github.com/user-attachments/assets/5155914d-bf3b-4210-aa7b-0976be7624c6" />
 
@@ -103,7 +103,7 @@ The purpose of a NAT Gateway in a private routing table is to facilitate outboun
 
 ## At this point l have managed to setup the VPC and successfully setup the private and public subnets
 
-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 ## Phase 2: Create Database
 <a name="CreateDatabase"></a>
@@ -112,7 +112,7 @@ l am going to create an RDS Database which allows this Car Rental App to insert 
 
 <img width="1900" height="763" alt="CreateDB" src="https://github.com/user-attachments/assets/9f0fdb1a-811a-4ad0-8cf3-bfb188cf2a6b" />
 
-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 <img width="1885" height="712" alt="CreateDB2" src="https://github.com/user-attachments/assets/29842998-3e45-4ac2-8d1f-0ebce839a5b5" />
 
@@ -149,14 +149,22 @@ l am going to create an RDS Database which allows this Car Rental App to insert 
 <p>6.No public IP, no SSH, no key pair.</p>
 <p>7.Attach sg-ssm-host.</p>
 <p>8.Configure Security Groups</p>
-      <p>sg-ssm-host → outbound: allow DB port to sg-rds.</p>
+
+   {
+     <p>sg-ssm-host → outbound: allow DB port to sg-rds.</p>
       <p>sg-rds → inbound: allow DB port from sg-ssm-host.</p>
       <p>sg-endpoints → inbound: allow TCP/443 from sg-ssm-host.</p>
+      }
+      
 <p>9.Create VPC Interface Endpoints</p>
 <p>10.Create these endpoints in the same private subnets:</p>
-      <p>com.amazonaws.<region>.ssm</p>
+
+
+    {
+     <p>com.amazonaws.<region>.ssm</p>
       <p>com.amazonaws.<region>.ec2messages</p>
       <p>com.amazonaws.<region>.ssmmessages</p>
+       } 
 <p>11.Enable Private DNS, attach sg-endpoints.</p>
 <p>12.Verify EC2 is SSM-managed</p>
 <p>13.Systems Manager → Fleet Manager → instance should appear.</p>
@@ -178,13 +186,15 @@ Now  am connecting to the database using SSM Port Forwarding using the bastion h
 
 <p>On your local machine open Powershell</p>
 <p>run this command </p>
-```json
+
 {
-  "host": ["<rds-endpoint>"],
-  "portNumber": ["3306"],
-  "localPortNumber": ["3306"]
-}
-```
+<p>aws ssm start-session `</p>
+  <p>--target "i-0ac8229767bf4826a" `</p>
+  <p>--document-name "AWS-StartPortForwardingSessionToRemoteHost" `</p>
+  <p>--parameters file://C:\Users\Tanaka\ssm-port.json</p>
+  } 
+
+
 <p>If successfull you going to see a Connection Accepted Session</p>
   
 <img width="1096" height="973" alt="SSM-Powershell-connect" src="https://github.com/user-attachments/assets/85345a36-8834-4eb6-97ea-787d992ae95e" />
