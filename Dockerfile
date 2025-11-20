@@ -13,10 +13,10 @@ COPY . .
 
 # Set environment variables for DB connection
 # These can be overridden at runtime using `docker run -e` or Docker Compose
-ENV DB_HOST=database-1.ccvw48c4oye3.us-east-1.rds.amazonaws.com
+ENV DB_HOST=Host
 ENV DB_PORT=3306
 ENV DB_USER=admin
-ENV DB_PASSWORD=Tanaka!234#
+ENV DB_PASSWORD=Password
 ENV DB_NAME=mydb
 
 # Expose app port
@@ -24,3 +24,4 @@ EXPOSE 3000
 
 # Start the app
 CMD ["node", "server.js"]
+
