@@ -4,8 +4,8 @@ services:
     ports:
       - "3000:3000"
     environment:
-      DB_HOST: database-1.ccvw48c4oye3.us-east-1.rds.amazonaws.com
+      DB_HOST: host
       DB_PORT: 3306
       DB_USER: admin
-      DB_PASSWORD: Tanaka!234#
-      DB_NAME: mydb
+      DB_PASSWORD: Password
+      DB_NAME: DB
