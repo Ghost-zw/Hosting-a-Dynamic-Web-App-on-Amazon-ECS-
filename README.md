@@ -253,30 +253,30 @@ Now lets connect our database to Sqlelectron to manage our database using the fo
 
 **Steps on how to create an ECS Task Definition**
 
-<p>In the ECS Dashboard, click on Task Definitions in the left sidebar.</p>
-<p>Click on the Create new Task Definition button.</p>
-<p>Select the appropriate launch type for your task:</p>
+<p>1.In the ECS Dashboard, click on Task Definitions in the left sidebar.</p>
+<p>2.Click on the Create new Task Definition button.</p>
+<p>3.Select the appropriate launch type for your task:</p>
   <p>Fargate (serverless)</p>
   <p>EC2 (for EC2 instances)</p>
-<p>Task Definition Name: Enter a unique name for your task definition.</p>
-<p>Task Role (optional): Select an IAM role that the task can assume for permissions.</p>
-<p>Network Mode: Choose the network mode for the containers in the task:</p>
+<p>4.Task Definition Name: Enter a unique name for your task definition.</p>
+<p>5.Task Role (optional): Select an IAM role that the task can assume for permissions.</p>
+<p>6.Network Mode: Choose the network mode for the containers in the task:</p>
   <p>bridge (default)</p>
   <p>host</p>
   <p>awsvpc (required for Fargate)</p>
-<p>Add Container Definitions</p>
-<p>Click on Add container.</p>
+<p>7.Add Container Definitions</p>
+<p>8.Click on Add container.</p>
 
 **Fill in the following details for the container:**
 
-<p>Container name: A unique name for the container.</p>
+<p>10.Container name: A unique name for the container.</p>
   <p>Image: Specify the Docker image (e.g., nginx:latest).</p>
   <p>Memory Limits: Allocate task memory (optional).</p>
   <p>CPU Units: Specify CPU units (optional).</p>
   <p>Environment Variables: Add any environment variables your container needs.</p>
   <p>Port Mappings: Define ports to expose the container (e.g., container port 80 or 3000).</p>
-<p>Click Add after configuring the container.</p>
-<p>After configuring all containers and settings, click on the Create button at the bottom of the page.</p>
+<p>11.Click Add after configuring the container.</p>
+<p>12.After configuring all containers and settings, click on the Create button at the bottom of the page.</p>
 
 
 -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -301,10 +301,10 @@ Add a port mapping to your
 
 **Steps on how to create an ECS Task**
 
-<p>To run the task, go back to the ECS Dashboard and select your cluster.</p>
-<p>Click on the Tasks tab, then click on Run new Task.</p>
-<p>Select the task definition you just created and configure the launch type (Fargate or EC2).</p>
-<p>Choose the number of tasks and any additional settings, then click Run Task.</p>
+<p>1.To run the task, go back to the ECS Dashboard and select your cluster.</p>
+<p>2.Click on the Tasks tab, then click on Run new Task.</p>
+<p>3.Select the task definition you just created and configure the launch type (Fargate or EC2).</p>
+<p>4.Choose the number of tasks and any additional settings, then click Run Task.</p>
 
 -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 <img width="1908" height="772" alt="Task1" src="https://github.com/user-attachments/assets/9873f603-89f0-404c-9100-85df0b35bbe2" />
