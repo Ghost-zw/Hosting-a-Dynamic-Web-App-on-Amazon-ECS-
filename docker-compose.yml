@@ -5,7 +5,8 @@ services:
       - "3000:3000"
     environment:
       DB_HOST: host
-      DB_PORT: 3306
-      DB_USER: admin
+      DB_PORT: port
+      DB_USER: user
       DB_PASSWORD: Password
       DB_NAME: DB
+
