@@ -261,18 +261,22 @@ Now lets connect our database to Sqlelectron to manage our database using the fo
 <p>4.Task Definition Name: Enter a unique name for your task definition.</p>
 <p>5.Task Role (optional): Select an IAM role that the task can assume for permissions.</p>
 <p>6.Network Mode: Choose the network mode for the containers in the task:</p>
+  {
   <p>bridge (default)</p>
   <p>host</p>
   <p>awsvpc (required for Fargate)</p>
+  }
 <p>7.Add Container Definitions</p>
 <p>8.Click on Add container.</p>
 
 **Fill in the following details for the container:**
 
 <p>10.Container name: A unique name for the container.</p>
+   {
   <p>Image: Specify the Docker image (e.g., nginx:latest).</p>
   <p>Memory Limits: Allocate task memory (optional).</p>
   <p>CPU Units: Specify CPU units (optional).</p>
+  }
   <p>Environment Variables: Add any environment variables your container needs.</p>
   <p>Port Mappings: Define ports to expose the container (e.g., container port 80 or 3000).</p>
 <p>11.Click Add after configuring the container.</p>
@@ -335,19 +339,19 @@ Add a port mapping to your
 ## Phase 5: Setup Amazon Cloudfront
 <a name="AmazonCloudfront"></a>
 
-<p>Open CloudFront Console: Search for and select CloudFront.</p>
-<p>Create Distribution: Click on Create Distribution.</p>
-<p>Select Web: Choose Web under the Select a delivery method for your content section.</p>
-<p>Configure Origin Settings:</p>
-<p>Origin Domain Name: Enter the URL of your origin (e.g., S3 bucket, web server).</p>
-<p>Origin Path (optional): Specify a path if needed.</p>
-<p>Configure Default Cache Behavior:</p>
-<p>Set Viewer Protocol Policy (e.g., HTTP and HTTPS).</p>
-<p>Choose how to handle caching and forwarding cookies, headers, etc.</p>
-<p>Configure Distribution Settings:</p>
-<p>Enter a Distribution Name and set other options like price class and logging preferences.</p>
-<p>Create Distribution: Click Create Distribution.</p>
-<p>Wait for Deployment: Monitor the status until it changes to "Deployed".</p>
+<p>1.Open CloudFront Console: Search for and select CloudFront.</p>
+<p>2.Create Distribution: Click on Create Distribution.</p>
+<p>3.Select Web: Choose Web under the Select a delivery method for your content section.</p>
+<p>4.Configure Origin Settings:</p>
+<p>5.Origin Domain Name: Enter the URL of your origin (e.g., S3 bucket, web server).</p>
+<p>6.Origin Path (optional): Specify a path if needed.</p>
+<p>7.Configure Default Cache Behavior:</p>
+<p>8.Set Viewer Protocol Policy (e.g., HTTP and HTTPS).</p>
+<p>9.Choose how to handle caching and forwarding cookies, headers, etc.</p>
+<p>10.Configure Distribution Settings:</p>
+<p>12.Enter a Distribution Name and set other options like price class and logging preferences.</p>
+<p>13.Create Distribution: Click Create Distribution.</p>
+<p>14.Wait for Deployment: Monitor the status until it changes to "Deployed".</p>
 
 --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 <img width="1910" height="805" alt="Cloudfront" src="https://github.com/user-attachments/assets/67c452c4-e1f7-4d27-934a-17b2121989ed" />
