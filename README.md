@@ -1,10 +1,11 @@
 # Hosting-a-Dynamic-Web-App-on-Amazon-ECS
-Dynamic Website Hosting using Amazon Route 53, Amazon Certificate Manager, Amazon RDS, Amazon ECS & ECR
+Dynamic Website Hosting using Amazon Route 53, Amazon Certificate Manager, Amazon RDS, Cloudfront, Amazon Systems Session Manager, Amazon EC2 instances, Amazon ECS & ECR
 This guide is going to show you how to create an Amazon S3 Website, using Amazon Route 53, Amazon Certificate Manager, Amazon RDS, Amazon ECS & ECR, VPC, ALB
 
 # Architecture 
 
-<img width="4768" height="1752" alt="dynamic web app" src="https://github.com/user-attachments/assets/56df5833-c990-4a81-9fd5-d3c517ca56b1" />
+<img width="1391" height="477" alt="Dynamic-web-app-arch" src="https://github.com/user-attachments/assets/3974cf12-5a2d-499f-b659-00e6e04cd29c" />
+
 
 This diagram shows the key components of our setup, including:
 
@@ -13,6 +14,8 @@ This diagram shows the key components of our setup, including:
 <p><b>Amazon RDS</b> is a managed cloud database service that automates routine tasks for relational databases, making it easier to set up, operate, and scale.</p>
 <p><b>Amazon ECS (Elastic Container Service)</b> is a managed service for running and managing Docker containers, while Amazon ECR (Elastic Container Registry) is a fully managed Docker container registry for storing, managing, and deploying container images.</p>
 <p><b>Amazon ALB (Application Load Balancer)</b> is a managed load balancing service that automatically distributes incoming application traffic across multiple targets, such as EC2 instances or containers, to enhance application availability and performance.</p>
+<p>Amazon CloudFront is a fast content delivery network (CDN) that securely delivers data, videos, applications, and APIs to users globally with low latency and high transfer speeds.</p>
+<p>Amazon Systems Manager Session Manager is a secure and fully managed tool that allows you to remotely access and manage your AWS instances without the need for an SSH connection or opening inbound ports.</P>
 <p><b>Amazon VPC (Virtual Private Cloud</b>) is a service that allows users to create a logically isolated network in the AWS cloud, enabling control over network configuration, IP address range, and security settings.</p>
 
 As we progress through this guide, we'll set up each of these components step by step.
@@ -24,7 +27,7 @@ As we progress through this guide, we'll set up each of these components step by
   - Phase 2 : [Create Database](#CreateDatabase)
   - Phase 3 : [Create SSM Manager](#CreateSSMManager)
   - Phase 4 : [Setup Amazon ECS](#AmazonECS)
-  - Phase 5 : [Setup Amazon Cloudfront](#AmazonALB)
+  - Phase 5 : [Setup Amazon Cloudfront](#AmazonCloudfront)
   - Phase 6 : [Setup Amazon ALB](#AmazonALB)
   - Phase 7 : [Request a Certicficate with ACM](#RequestACertficate)
   - Phase 8 : [Setting Up Route 53](#Route53-Setup)
@@ -158,13 +161,6 @@ l am going to create an RDS Database which allows this Car Rental App to insert 
 <p>12.Verify EC2 is SSM-managed</p>
 <p>13.Systems Manager → Fleet Manager → instance should appear.</p>
 
-```json
-{
-  "host": ["<rds-endpoint>"],
-  "portNumber": ["3306"],
-  "localPortNumber": ["3306"]
-}
-```
 
 <img width="1897" height="757" alt="CreateBastionH" src="https://github.com/user-attachments/assets/f0218991-70e0-413f-a83e-97ecc1ae8e96" />
 
@@ -172,13 +168,13 @@ l am going to create an RDS Database which allows this Car Rental App to insert 
 
 <img width="1870" height="707" alt="CreateBastionH2" src="https://github.com/user-attachments/assets/a429fa12-3b48-47a2-a598-3a8c7fe93ba6" />
 
-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 <img width="1871" height="762" alt="CreateBastionH3" src="https://github.com/user-attachments/assets/55b6b44e-b01b-4102-a1d6-1791801312d9" />
 
-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-Now  am connecting to the database using ssh using the bastion host using the following steps:
+Now  am connecting to the database using SSM Port Forwarding using the bastion host using the following steps:
 
 <p>On your local machine open Powershell</p>
 <p>run this command </p>
@@ -217,7 +213,7 @@ Now lets connect our database to Sqlelectron to manage our database using the fo
 
 ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-## Phase 3: CREATE  ECS Cluster, Task Definition and Task
+## Phase 4: CREATE  ECS Cluster, Task Definition and Task
 <a name="AmazonECS"></a>
 
 **Steps on how to create a ECS Cluster**
@@ -327,26 +323,70 @@ Add a port mapping to your
 
 <img width="1900" height="870" alt="TaskRunning" src="https://github.com/user-attachments/assets/84113b2d-b397-4ff7-b70e-eecd7108f794" />
 
--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-## Phase 4: CREATE  Application Load Balancer
+
+## Phase 5: Setup Amazon Cloudfront
+<a name="AmazonCloudfront"></a>
+
+<p>Open CloudFront Console: Search for and select CloudFront.</p>
+<p>Create Distribution: Click on Create Distribution.</p>
+<p>Select Web: Choose Web under the Select a delivery method for your content section.</p>
+<p>Configure Origin Settings:</p>
+<p>Origin Domain Name: Enter the URL of your origin (e.g., S3 bucket, web server).</p>
+<p>Origin Path (optional): Specify a path if needed.</p>
+<p>Configure Default Cache Behavior:</p>
+<p>Set Viewer Protocol Policy (e.g., HTTP and HTTPS).</p>
+<p>Choose how to handle caching and forwarding cookies, headers, etc.</p>
+<p>Configure Distribution Settings:</p>
+<p>Enter a Distribution Name and set other options like price class and logging preferences.</p>
+<p>Create Distribution: Click Create Distribution.</p>
+<p>Wait for Deployment: Monitor the status until it changes to "Deployed".</p>
+
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+<img width="1910" height="805" alt="Cloudfront" src="https://github.com/user-attachments/assets/67c452c4-e1f7-4d27-934a-17b2121989ed" />
+
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+<img width="1911" height="812" alt="Cloudfront2" src="https://github.com/user-attachments/assets/a5de4111-63e5-4895-9599-5b5f7c467494" />
+
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+<img width="1895" height="802" alt="Cloudfront3" src="https://github.com/user-attachments/assets/6b747bc7-07a5-473e-af63-fe51c368f389" />
+
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+<img width="1913" height="415" alt="Cloudfront4" src="https://github.com/user-attachments/assets/9eff1e1d-91dd-409c-a624-5933956e3cad" />
+
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+<img width="1913" height="657" alt="Cloudfront5" src="https://github.com/user-attachments/assets/decea32f-1a85-42e9-8e2a-a645561c1d71" />
+
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+<img width="1902" height="803" alt="Cloudfront6" src="https://github.com/user-attachments/assets/1c3e43fa-3d91-44a9-bc81-d5d6f15c8b76" />
+
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+## Phase 6: CREATE  Application Load Balancer
 <a name="AmazonALB"></a>
 
-<p>Open EC2 Dashboard: Search for and select EC2.</p>
-<p>Navigate to Load Balancers: In the left sidebar, click on Load Balancers under Load Balancing.</p>
-<p>Create Load Balancer: Click Create Load Balancer and select Application Load Balancer.</p>
-<p>Configure Basic Settings:</p>
-<p>Enter a name for the load balancer.</p>
-<p>Choose the scheme (Internet-facing or Internal).</p>
-<p>Select the IP address type (IPv4 or Dualstack).</p>
-<p>Configure Listeners and Availability Zones:</p>
-<p>Set up listeners (default is HTTP on port 80, And port mapping your container).</p>
-<p>Select a VPC and subnet(s) for availability zones.</p>
-<p>Configure Security Groups: Choose or create a security group that allows inbound traffic on your listener ports.</p>
-<p>Configure Routing:</p>
-<p>Create a target group and specify its name, target type, and health check settings.</p>
-<p>Register targets (EC2 instances) in the target group.</p>
-<p>Review and Create: Review your settings and click Create Load Balancer.</p>
+<p>1.Open EC2 Dashboard: Search for and select EC2.</p>
+<p>2.Navigate to Load Balancers: In the left sidebar, click on Load Balancers under Load Balancing.</p>
+<p>3.Create Load Balancer: Click Create Load Balancer and select Application Load Balancer.</p>
+<p>4.Configure Basic Settings:</p>
+<p>5.Enter a name for the load balancer.</p>
+<p>6.Choose the scheme (Internet-facing or Internal).</p>
+<p>7.Select the IP address type (IPv4 or Dualstack).</p>
+<p>8.Configure Listeners and Availability Zones:</p>
+<p>9.Set up listeners (default is HTTP on port 80, And port mapping your container).</p>
+<p>10.Select a VPC and subnet(s) for availability zones.</p>
+<p>11.Configure Security Groups: Choose or create a security group that allows inbound traffic on your listener ports.</p>
+<p>14.Configure Routing:</p>
+<p>15.Create a target group and specify its name, target type, and health check settings.</p>
+<p>16.Register targets (EC2 instances) in the target group.</p>
+<p>17.Review and Create: Review your settings and click Create Load Balancer.</p>
 
 Monitor: Once created, monitor the ALB from the Load Balancers section and test it using the provided DNS name.
 
@@ -367,29 +407,29 @@ Monitor: Once created, monitor the ALB from the Load Balancers section and test 
 
 -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-## Phase 5: Request a Certicficate with ACM
+## Phase 7: Request a Certicficate with ACM
 <a name="RequestACertficate"></a>
 
 l had already requested my Certificate but, to request a Certificate you need to have a domain and then follow the steps on the Amazon ACM page to get a certificate it takes 5 - 10 minutes to get your certificate.
 
--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 <img width="1897" height="360" alt="RequestACM" src="https://github.com/user-attachments/assets/f0e0d5dc-86c9-4174-a30c-a7644814094a" />
 
--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-## Phase 6 : Setting Up Route 53
+## Phase 8 : Setting Up Route 53
 <a name="Route53-Setup"></a>
 
 l already have a domain in Route 53, l only have to create a record for my Amazon ALB as an Alias so that it can be reachable to the public in secure way.
 
--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 <img width="1872" height="762" alt="Route53" src="https://github.com/user-attachments/assets/2b68705a-3601-469d-a9ad-945b40721120" />
 
--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-## Phase 7 : Test the the whole solution
+## Phase 9 : Test the the whole solution
 <a name="Testing"></a>
 
 My first test was using the ECS Task's Public ip with a port binding to my container whch is port 3000
@@ -397,21 +437,23 @@ My first test was using the ECS Task's Public ip with a port binding to my conta
 -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 <img width="1873" height="892" alt="Testing1" src="https://github.com/user-attachments/assets/fab3e15f-21f0-44dd-b03e-ba87c8a1ba0d" />
 
--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 The second test is using ALB which is connected to my ECS Tasks.
 
--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
 <img width="1877" height="990" alt="TestingALB" src="https://github.com/user-attachments/assets/8adec199-a431-4a2b-8d27-f58ca38eb8c9" />
 
--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 The thrird test is when l used my Route 53 Record tech-with-tanaka.com
 
--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
 <img width="1897" height="1063" alt="Testing-Route53" src="https://github.com/user-attachments/assets/92db8dc9-2100-4634-a19a-c1b2aeeb9351" />
 
--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 
 **3. Conclusion**
